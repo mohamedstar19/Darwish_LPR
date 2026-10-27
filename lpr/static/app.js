@@ -165,7 +165,7 @@ function logRow(ev) {
     el("td", {}, ev.camera_name),
     el("td", {}, fmtTime(ev.ts)),
     el("td", {}, KINDS[ev.vehicle_type] || ev.vehicle_type),
-    el("td", {}, `${Math.round(ev.confidence * 100)}% · ${ev.reads}×`));
+    el("td", {}, `${Math.round(ev.confidence * 100).toLocaleString("ar-EG")}٪ · ${ev.reads.toLocaleString("ar-EG")} قراية`));
 }
 
 async function loadLog(reset) {
