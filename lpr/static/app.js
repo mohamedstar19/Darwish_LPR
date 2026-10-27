@@ -79,14 +79,14 @@ function renderCam(c) {
     $("#cams").append(card.root);
   }
   const meta = card.root.querySelector(".meta");
-  meta.replaceChildren(
+  meta.replaceChildren(...[
     el("strong", {}, c.name),
     el("span", { class: "badge " + (c.online ? "on" : "off") }, c.online ? "متصلة" : "غير متصلة"),
     c.resolution ? el("span", { class: "badge" }, c.resolution) : null,
-    el("span", { class: "badge" }, `${c.processing_fps} / ${c.target_fps} fps`),
+    el("span", { class: "badge", dir: "ltr", title: "فريمات بتتحلل في الثانية / المطلوب" }, `${c.processing_fps} / ${c.target_fps} fps`),
     c.error ? el("span", { class: "err" }, c.error) : null,
     c.live_reads && c.live_reads.length ? el("span", { class: "reads" }, c.live_reads.map(plateFromDisplay)) : null,
-  );
+  ].filter(Boolean));
 }
 
 async function refreshCams() {

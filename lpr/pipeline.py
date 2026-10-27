@@ -87,7 +87,7 @@ class CameraWorker:
             "last_frame_age": round(time.time() - self.source.last_frame_ts, 1) if self.source.last_frame_ts else None,
             "active_tracks": self.voter.active_tracks(),
             "error": self.source.last_error or self.last_error,
-            "live_reads": sorted(set(self._labels.values())),
+            "live_reads": sorted(set(self._labels.values())),  # dict is replaced, never mutated
         }
 
     def preview_jpeg(self) -> bytes | None:
@@ -145,7 +145,8 @@ class CameraWorker:
                     if read is not None:
                         self.voter.add(self.cam.id, v.track_id, v.kind, read.plate, read.conf, ts,
                                        vehicle_img=vehicle_img.copy(), plate_img=plate_img.copy())
-                        self._labels[v.track_id] = read.plate.display
+                        # copy-on-write: status() reads this dict from the web thread
+                        self._labels = {**self._labels, v.track_id: read.plate.display}
             drawn.append((v, plate_boxes, usable))
         self._emit(self.voter.collect(ts))
         self._update_preview(image, drawn)
