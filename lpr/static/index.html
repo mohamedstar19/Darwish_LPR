@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>درويش — قارئ اللوحات</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">▣</span>
+    <div>
+      <h1>قارئ لوحات السيارات</h1>
+      <p class="sub" id="device">جارٍ الاتصال…</p>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="live" role="tab">مباشر</button>
+    <button class="tab" data-tab="log" role="tab">السجل</button>
+    <button class="tab" data-tab="watch" role="tab">قائمة المراقبة</button>
+  </nav>
+</header>
+
+<main>
+  <section id="tab-live" class="panel active">
+    <div class="stats">
+      <div class="stat"><span class="num" id="st-events">—</span><span class="lbl">مرور اليوم</span></div>
+      <div class="stat"><span class="num" id="st-unique">—</span><span class="lbl">لوحات مختلفة</span></div>
+      <div class="stat alert"><span class="num" id="st-alerts">—</span><span class="lbl">تنبيهات</span></div>
+    </div>
+    <div class="live-layout">
+      <div class="cams" id="cams"></div>
+      <aside class="feed">
+        <h2>آخر اللوحات <span class="dot" id="live-dot" title="البث المباشر"></span></h2>
+        <ol id="feed" class="feed-list"></ol>
+      </aside>
+    </div>
+  </section>
+
+  <section id="tab-log" class="panel">
+    <form class="filters" id="log-form">
+      <input type="search" id="q" placeholder="ابحث برقم اللوحة… مثال: ب ط ص ١٢٣" maxlength="40">
+      <select id="camera-filter"><option value="">كل الكاميرات</option></select>
+      <input type="date" id="day">
+      <button type="submit">بحث</button>
+      <a class="btn-secondary" id="csv" href="/api/events.csv">تصدير CSV</a>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>الصورة</th><th>اللوحة</th><th>الكاميرا</th><th>الوقت</th><th>النوع</th><th>الثقة</th></tr></thead>
+        <tbody id="log-body"></tbody>
+      </table>
+    </div>
+    <button class="btn-secondary more" id="more">تحميل المزيد</button>
+  </section>
+
+  <section id="tab-watch" class="panel">
+    <form class="filters" id="watch-form">
+      <input id="w-plate" required placeholder="رقم اللوحة: ب ط ص ١٢٣٤" maxlength="40">
+      <input id="w-label" placeholder="ملاحظة (اختياري)" maxlength="100">
+      <select id="w-kind">
+        <option value="alert">تنبيه عند المرور</option>
+        <option value="allow">مسموح (عربيات معروفة)</option>
+      </select>
+      <button type="submit">إضافة</button>
+    </form>
+    <p class="hint">لوحات «التنبيه» بتظهر بلون أحمر في السجل، وبتتبعت على الـ webhook لو متظبط.</p>
+    <ul id="watch-list" class="watch-list"></ul>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog id="viewer"><img alt=""><button type="button" onclick="this.closest('dialog').close()">إغلاق</button></dialog>
+<script src="/static/app.js"></script>
+</body>
+</html>

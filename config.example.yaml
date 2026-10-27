@@ -1,0 +1,79 @@
+# Darwish LPR configuration — copy to config.yaml and edit.
+# Secrets come from environment variables: ${NAME} is replaced at startup.
+
+device: auto            # auto | cpu | cuda | cuda:0  (auto = GPU if available)
+
+# Hikvision NVR. Use a dedicated read-only user, not admin.
+nvr:
+  host: 192.168.1.64
+  port: 554
+  username: lpr
+  password: ${NVR_PASSWORD}
+  stream: main          # main = full resolution (needed for plates), sub = low-res
+
+cameras:
+  - id: gate
+    name: البوابة الرئيسية
+    channel: 1          # -> rtsp://.../Streaming/Channels/101
+    process_fps: 6      # frames analysed per second (CPU: 3-5, GPU: 8-15)
+    min_vehicle_width: 120
+    # Only read plates where vehicles are close and plates are big enough.
+    # Fractions of the frame: [x1, y1, x2, y2]. Remove to use the whole frame.
+    roi: [0.0, 0.35, 1.0, 1.0]
+
+  - id: street
+    name: الشارع
+    channel: 2
+    stream: main        # per-camera override
+    process_fps: 6
+
+  # Any other source works too:
+  # - id: other
+  #   name: كاميرا مباشرة
+  #   source: rtsp://user:pass@192.168.1.70:554/Streaming/Channels/101
+  # - id: usb
+  #   name: كاميرا USB
+  #   source: 0
+  # - id: test
+  #   name: فيديو تجربة
+  #   source: samples/street.mp4
+
+detection:
+  vehicle_model: yolov8n.pt   # COCO model, downloaded automatically on first run
+  vehicle_conf: 0.35
+  imgsz: 640
+  plate_model: models/egypt_plate.pt   # finds the plate inside each vehicle
+  plate_conf: 0.4
+  plate_imgsz: 416
+
+ocr:
+  char_model: models/egypt_chars.pt    # reads each Arabic letter / digit on the plate
+  char_conf: 0.35
+  imgsz: 256
+  rules:                      # valid Egyptian plate shapes
+    min_letters: 1
+    max_letters: 3
+    min_digits: 1
+    max_digits: 4
+    min_total: 4
+
+voting:
+  min_reads: 2                # agreeing reads needed when the vehicle leaves
+  confirm_reads: 4            # agreeing reads that confirm a plate immediately
+  track_timeout_sec: 2.0      # vehicle considered gone after this long unseen
+  dedup_window_sec: 60        # same plate on same camera within this window = one event
+
+storage:
+  db_path: data/lpr.db
+  snapshots_dir: data/snapshots
+  retention_days: 30          # older events and images are deleted automatically (0 = keep forever)
+
+web:
+  host: 0.0.0.0
+  port: 8000
+  username: admin
+  password: ${LPR_WEB_PASSWORD}
+
+alerts:
+  webhook_url: null           # POST JSON here when a watchlist "alert" plate passes (e.g. n8n)
+  webhook_all_events: false   # true = send every plate, not only alerts

@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# local config and secrets
+config.yaml
+.env
+
+# runtime data (plates are personal data — never commit)
+data/
+runs/
+
+# models and media
+*.pt
+!models/*.pt
+*.onnx
+*.engine
+*.mp4
+*.avi
+*.mkv
+*.mov
+samples/
